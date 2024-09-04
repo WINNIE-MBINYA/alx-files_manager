@@ -17,21 +17,21 @@ import dbClient from '../utils/db';
 export default class AuthController {
   // Static method to handle the 'getConnect' request
   // This method authenticates the user and generates a token if successful
-  static async getConnect(request, response) {
+  static async getConnect (request, response) {
     try {
       // Extract the Authorization header and decode the Base64-encoded string
       const encodeAuthPair = request.headers.authorization.split(' ')[1];
       const decodeAuthPair = Buffer.from(encodeAuthPair, 'base64')
         .toString()
         .split(':');
-      
+
       // Extract the email and password from the decoded string
       const _email = decodeAuthPair[0];
       const pwd = UtilController.SHA1(decodeAuthPair[1]);
 
       // Query the database to find the user by email
       const user = await dbClient.filterUser({ email: _email });
-      
+
       // Check if the provided password matches the one in the database
       if (user.password !== pwd) {
         // If the password doesn't match, return a 401 Unauthorized response
@@ -39,10 +39,10 @@ export default class AuthController {
       } else {
         // If the password matches, generate a new authentication token
         const _token = v4();
-        
+
         // Store the token in Redis with a 24-hour expiration
         await redisClient.set(`auth_${_token}`, user._id.toString(), 86400);
-        
+
         // Return the token in the response with a 200 OK status
         response.status(200).json({ token: _token }).end();
       }
@@ -54,13 +54,13 @@ export default class AuthController {
 
   // Static method to handle the 'getDisconnect' request
   // This method logs the user out by deleting their authentication token
-  static async getDisconnect(request, response) {
+  static async getDisconnect (request, response) {
     // Extract the token from the request
     const { token } = request;
-    
+
     // Delete the token from Redis to log the user out
     await redisClient.del(token);
-    
+
     // Return a 204 No Content response to indicate successful logout
     response.status(204).end();
   }

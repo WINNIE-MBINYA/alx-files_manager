@@ -1,5 +1,5 @@
-import express from 'express';  // Import Express framework
-import { env } from 'process';  // Import environment variables
+import express from 'express'; // Import Express framework
+import { env } from 'process'; // Import environment variables
 
 // Import the main routes for the application
 const mainRoute = require('./routes/index');
